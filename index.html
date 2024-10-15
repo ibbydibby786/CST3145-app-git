@@ -22,7 +22,7 @@
     </header>
 
     <main>
-      <div v-if="showProduct">
+      <div v-if="!showProduct">
         <figure>
           <img v-bind:src="product.image">
         </figure>
@@ -41,6 +41,23 @@
 
       <div v-else>
         <h1>Welcome to the Checkout page</h1>
+        <p>
+          <strong>Name:</strong>
+          <input type="text" v-model.trim="order.name">
+        </p>
+        <p>
+          <strong>PhoneNumber:</strong>
+          <input type="text" v-model.number="order.phonenumber">
+        </p>
+
+        <h2>Order Information</h2>
+        <p>
+        <strong>Name: </strong>{{order.name}}
+      </p>
+    </p>
+        <strong>PhoneNumber: </strong>{{order.phonenumber}}
+      </p>
+      <button v-on:click="submitCheckoutForm">Place Order</button>
       </div>
     </main>
   </div>
@@ -59,7 +76,11 @@
           image: "images/maths.png",
           availableInventory: 5
         },
-        cart: []
+        cart: [],
+        order: {
+          name: "",
+          phonenumber: ""
+        }
       },
       methods: {
         showCheckout: function() {
@@ -71,6 +92,9 @@
         },
         addItemToTheCart: function() {
           this.cart.push(this.product.id);
+        },
+        submitCheckoutForm(){
+          alert("congratulations, order submitted:)")
         }
       },
       computed: {
