@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
   <script src="products.js"></script>
+  <script src="Lessons.css"></script>
 
   <style>
     body {
@@ -134,27 +135,32 @@
 <body>
   <div id="app">
     <header>
-      <h1>{{ sitename }}</h1>
-      <button @click="showCheckout">
-        {{ totalItemsInTheCart }}
+      <h1 v-text="sitename"></h1>
+      <button v-on:click="showCheckout">
+        {{ totalLessonsInTheCart }}
         <span class="fa-solid fa-cart-shopping"></span>
         Checkout
       </button>
     </header>
 
     <div v-if="showProduct">
-      <main>
+      <main> 
+        <div v-for="product in sortedProducts"></div>
+       
         <div v-for="product in products" :key="product.id" class="product-item">
           <h1>{{ product.title }}</h1>
-
+          
           <figure>
             <img :src="product.image" alt="Product Image" />
           </figure>
 
           <p v-html="product.description"></p>
-          <p>Price: ${{ product.price.toFixed(2) }}</p>
+          <p>Price: £{{ product.price.toFixed(2) }}</p>
 
-          <button v-if="canAddToCart(product)" @click="addItemToCart(product)">
+          <h3>Spaces: {{ product.availableSpace }}</h3>
+          
+
+          <button v-if="canAddToCart(product)" v-on:click="addLessonsToCart(product)">
             Add to the Cart
           </button>
           <button v-else disabled>Add to the Cart</button>
@@ -162,14 +168,10 @@
           <!-- Correct inventory and stock display -->
           <span v-if="itemsLeft(product) === 0">Sold out!</span>
           <span v-else-if="itemsLeft(product) < 5">Only {{ itemsLeft(product) }} left!</span>
-          <span v-else>In stock</span>
-
-          <!-- Rating display -->
-          <div>
-            <span v-for="n in product.rating" :key="n">★</span>
-            <span v-for="n in 5 - product.rating" :key="n">☆</span>
-          </div>
+          <span v-else>Buy Now</span>
+          
         </div>
+
       </main>
     </div>
 
@@ -212,7 +214,7 @@
         showCheckout() {
           this.showProduct = !this.showProduct;
         },
-        addItemToCart(product) {
+        addLessonsToCart(product) {
           this.cart.push(product.id);
         },
         submitCheckoutForm() {
@@ -229,11 +231,22 @@
         }
       },
       computed: {
-        totalItemsInTheCart() {
+        totalLessonsInTheCart() {
           return this.cart.length;
+        },
+        sortedProducts(){
+          function compare(a,b){
+              if (a.price > b.price) return -1
+              if (a.price > b.price) return 1
+              return 0;
+            }
+            return this.products.sort(compare);
+
+
+
         }
       }
-    });
+    })
   </script>
 </body>
 
