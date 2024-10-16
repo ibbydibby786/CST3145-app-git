@@ -1,81 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+  <script src="products.js"></script>
 
-    <title>After School App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 1.5em;
+      position: sticky;
+      top: 0;
+    }
+
+    header button {
+      background-color: white;
+      color: #4CAF50;
+      border: none;
+      padding: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    header button:hover {
+      background-color: #f4f4f4;
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .product-item {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 250px;
+      text-align: center;
+    }
+
+    .product-item h1 {
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    .product-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    .product-item button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-top: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    .product-item button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .product-item span {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .product-item .fa-star {
+      color: gold;
+    }
+
+    /* Checkout form */
+    div[v-if="!showProduct"] {
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    div[v-if="!showProduct"] input {
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    div[v-if="!showProduct"] button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.1em;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+
+  <title>After School App</title>
 </head>
+
 <body>
   <div id="app">
     <header>
-      <h1 v-text="sitename"></h1>
-      <button v-on:click="showCheckout">
-        {{ itemsInTheCart }}
+      <h1>{{ sitename }}</h1>
+      <button @click="showCheckout">
+        {{ totalItemsInTheCart }}
         <span class="fa-solid fa-cart-shopping"></span>
         Checkout
       </button>
     </header>
 
-    <main>
-      <div v-if="!showProduct">
-        <figure>
-          <img v-bind:src="product.image">
-        </figure>
+    <div v-if="showProduct">
+      <main>
+        <div v-for="product in products" :key="product.id" class="product-item">
+          <h1>{{ product.title }}</h1>
 
-        <h1 v-text="product.title"></h1>
-        <p v-text="product.description"></p>
-        <p>Price: {{product.price}}</p>
+          <figure>
+            <img :src="product.image" alt="Product Image" />
+          </figure>
 
-        <button v-on:click="addItemToTheCart" v-if="canAddToTheCart">Add to the Cart</button>
+          <p v-html="product.description"></p>
+          <p>Price: ${{ product.price.toFixed(2) }}</p>
 
-        <div v-else>
-          <button disabled>Add to the Cart</button>
-          You have added all the available items for this product in your cart
+          <button v-if="canAddToCart(product)" @click="addItemToCart(product)">
+            Add to the Cart
+          </button>
+          <button v-else disabled>Add to the Cart</button>
+
+          <!-- Correct inventory and stock display -->
+          <span v-if="itemsLeft(product) === 0">Sold out!</span>
+          <span v-else-if="itemsLeft(product) < 5">Only {{ itemsLeft(product) }} left!</span>
+          <span v-else>In stock</span>
+
+          <!-- Rating display -->
+          <div>
+            <span v-for="n in product.rating" :key="n">★</span>
+            <span v-for="n in 5 - product.rating" :key="n">☆</span>
+          </div>
         </div>
-      </div>
+      </main>
+    </div>
 
-      <div v-else>
-        <h1>Welcome to the Checkout page</h1>
-        <p>
-          <strong>Name:</strong>
-          <input type="text" v-model.trim="order.name">
-        </p>
-        <p>
-          <strong>PhoneNumber:</strong>
-          <input type="text" v-model.number="order.phonenumber">
-        </p>
+    <div v-else>
+      <h1>Welcome to the Checkout Page</h1>
+      <p>
+        <strong>Name:</strong>
+        <input type="text" v-model.trim="order.name" />
+      </p>
+      <p>
+        <strong>Phone Number:</strong>
+        <input type="text" v-model.trim="order.phonenumber" />
+      </p>
 
-        <h2>Order Information</h2>
-        <p>
-        <strong>Name: </strong>{{order.name}}
+      <h2>Order Information</h2>
+      <p>
+        <strong>Name:</strong> {{ order.name }}
       </p>
-    </p>
-        <strong>PhoneNumber: </strong>{{order.phonenumber}}
+      <p>
+        <strong>Phone Number:</strong> {{ order.phonenumber }}
       </p>
-      <button v-on:click="submitCheckoutForm">Place Order</button>
-      </div>
-    </main>
+      <button @click="submitCheckoutForm">Place Order</button>
+    </div>
   </div>
 
   <script>
-    let webstore = new Vue({
+    new Vue({
       el: "#app",
       data: {
         sitename: "After School App",
         showProduct: true,
-        product: {
-          id: 1001,
-          title: "Cat Food, 25lb bag",
-          description: "A 25 pound bag of <em>irresistible</em>, organic goodness for your cat.",
-          price: 2000,
-          image: "images/maths.png",
-          availableInventory: 5
-        },
+        products: products,  // this connects to the product.js file
         cart: [],
         order: {
           name: "",
@@ -83,29 +209,32 @@
         }
       },
       methods: {
-        showCheckout: function() {
-          if (this.showProduct) {
-            this.showProduct = false;
-          } else {
-            this.showProduct = true;
-          }
+        showCheckout() {
+          this.showProduct = !this.showProduct;
         },
-        addItemToTheCart: function() {
-          this.cart.push(this.product.id);
+        addItemToCart(product) {
+          this.cart.push(product.id);
         },
-        submitCheckoutForm(){
-          alert("congratulations, order submitted:)")
+        submitCheckoutForm() {
+          alert("Congratulations, order submitted!");
+        },
+        canAddToCart(product) {
+          return product.availableInventory > this.cartCount(product.id);
+        },
+        cartCount(productId) {
+          return this.cart.filter(id => id === productId).length;
+        },
+        itemsLeft(product) {
+          return product.availableInventory - this.cartCount(product.id);
         }
       },
       computed: {
-        itemsInTheCart: function() {
-          return this.cart.length || "";
-        },
-        canAddToTheCart: function() {
-          return this.product.availableInventory > this.cart.length;
+        totalItemsInTheCart() {
+          return this.cart.length;
         }
       }
-    })
+    });
   </script>
 </body>
+
 </html>
