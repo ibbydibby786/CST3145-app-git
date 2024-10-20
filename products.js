@@ -4,7 +4,7 @@ let products = [
       "title": "Maths",
       "description": "London",
       "price": 100.00,
-      "image": "images//maths.png",
+      "image": "images/maths.png",
       "availableInventory": 20,
        "availableSpace": 5
       
@@ -14,7 +14,7 @@ let products = [
       "title": "English",
       "description": "Oxford",
       "price": 90.00,
-      "image": "images//english.png",
+      "image": "images/english.png",
       "availableInventory": 15,
       "availableSpace": 10
       
@@ -24,7 +24,7 @@ let products = [
       "title": "Science",
       "description": "Luton",
       "price": 80.00,
-      "image": "images/cat-litter.jpg",
+      "image": "images/science.png",
       "availableInventory": 10,
       "availableSpace": 10
       
@@ -34,7 +34,7 @@ let products = [
       "title": "Religious Studies",
       "description": "York",
       "price": 70.00,
-      "image": "images/cat-house.jpg",
+      "image": "images/religious studies.png",
       "availableInventory": 15,
       "availableSpace": 10
       
@@ -44,7 +44,7 @@ let products = [
       "title": "Music",
       "description": "Bristol",
       "price": 60.00,
-      "image": "images/laser-pointer.jpg",
+      "image": "images/music.png",
       "availableInventory": 30,
       "availableSpace": 10
       
@@ -54,7 +54,7 @@ let products = [
       "title": "PE",
       "description": "Bedford",
       "price": 50.00,
-      "image": "images//maths.png",
+      "image": "images/pe.png",
       "availableInventory": 5,
        "availableSpace": 10
       
@@ -64,7 +64,7 @@ let products = [
         "title": "IT",
         "description": "Blackburn",
         "price": 40.00,
-        "image": "images//maths.png",
+        "image": "images/it.png",
         "availableInventory": 5,
          "availableSpace": 10
         
@@ -74,7 +74,7 @@ let products = [
         "title": "Business studies",
         "description": "Leicstershire",
         "price": 30.00,
-        "image": "images//maths.png",
+        "image": "images/business studies.png",
         "availableInventory": 5,
          "availableSpace": 10
         
@@ -84,7 +84,7 @@ let products = [
         "title": "Art",
         "description": "Lancaster",
         "price": 20.00,
-        "image": "images//maths.png",
+        "image": "images/art.png",
         "availableInventory": 10,
          "availableSpace": 10
         
@@ -94,7 +94,7 @@ let products = [
         "title": "History",
         "description": "Sheffield",
         "price": 10.00,
-        "image": "images//maths.png",
+        "image": "images/history.png",
         "availableInventory": 10,
          "availableSpace": 10
         
