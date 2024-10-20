@@ -14,7 +14,7 @@ let products = [
       "title": "English",
       "description": "Oxford",
       "price": 90.00,
-      "image": "images//maths.png",
+      "image": "images//english.png",
       "availableInventory": 15,
       "availableSpace": 10
       
