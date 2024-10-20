@@ -9,8 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
   <script src="products.js"></script>
-  <script src="Lessons.css"></script>
-
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -127,6 +126,12 @@
       cursor: pointer;
       margin-top: 20px;
     }
+
+    /* Sorting section */
+    .sort-options {
+      text-align: left;
+      padding: 20px;
+    }
   </style>
 
   <title>After School App</title>
@@ -144,10 +149,43 @@
     </header>
 
     <div v-if="showProduct">
-      <main> 
-        <div v-for="product in sortedProducts"></div>
-       
-        <div v-for="product in products" :key="product.id" class="product-item">
+      <!-- Sorting Options -->
+      <div class="sort-options">
+        <h3>Sort by</h3>
+        <label>
+          <input type="radio" value="title" v-model="sortOption" />
+          Subject
+        </label>
+        <br/>
+        <label>
+          <input type="radio" value="description" v-model="sortOption" />
+          Location
+        </label>
+        <br/>
+        <label>
+          <input type="radio" value="price" v-model="sortOption" />
+          Price
+        </label>
+        <br/>
+        <label>
+          <input type="radio" value="availableInventory" v-model="sortOption" />
+          Availability
+        </label>
+        <br/>
+        <h4>Order</h4>
+        <label>
+          <input type="radio" value="ascending" v-model="sortDirection" />
+          Ascending
+        </label>
+        <br/>
+        <label>
+          <input type="radio" value="descending" v-model="sortDirection" />
+          Descending
+        </label>
+      </div>
+
+      <main>
+        <div v-for="product in sortedProducts" :key="product.id" class="product-item">
           <h1>{{ product.title }}</h1>
           
           <figure>
@@ -158,20 +196,17 @@
           <p>Price: £{{ product.price.toFixed(2) }}</p>
 
           <h3>Spaces: {{ product.availableSpace }}</h3>
-          
 
           <button v-if="canAddToCart(product)" v-on:click="addLessonsToCart(product)">
             Add to the Cart
           </button>
           <button v-else disabled>Add to the Cart</button>
 
-          <!-- Correct inventory and stock display -->
           <span v-if="itemsLeft(product) === 0">Sold out!</span>
           <span v-else-if="itemsLeft(product) < 5">Only {{ itemsLeft(product) }} left!</span>
           <span v-else>Buy Now</span>
           
         </div>
-
       </main>
     </div>
 
@@ -208,7 +243,9 @@
         order: {
           name: "",
           phonenumber: ""
-        }
+        },
+        sortOption: 'price',  // Default sorting option
+        sortDirection: 'ascending'  // Default sorting direction
       },
       methods: {
         showCheckout() {
@@ -234,16 +271,28 @@
         totalLessonsInTheCart() {
           return this.cart.length;
         },
-        sortedProducts(){
-          function compare(a,b){
-              if (a.price > b.price) return -1
-              if (a.price > b.price) return 1
-              return 0;
-            }
-            return this.products.sort(compare);
+        sortedProducts() {
+          let sortedArray = [...this.products];
 
+          if (this.sortOption) {
+            sortedArray.sort((a, b) => {
+              let fieldA = a[this.sortOption];
+              let fieldB = b[this.sortOption];
 
+              if (typeof fieldA === 'string') {
+                fieldA = fieldA.toLowerCase();
+                fieldB = fieldB.toLowerCase();
+              }
 
+              if (this.sortDirection === 'ascending') {
+                return fieldA > fieldB ? 1 : -1;
+              } else if (this.sortDirection === 'descending') {
+                return fieldA < fieldB ? 1 : -1;
+              }
+            });
+          }
+
+          return sortedArray;
         }
       }
     })
