@@ -38,8 +38,9 @@
       border-radius: 5px;
     }
 
-    header button:hover {
-      background-color: #f4f4f4;
+    header button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
 
     main {
@@ -98,7 +99,7 @@
     }
 
     /* Checkout form */
-    div[v-if="!showProduct"] {
+    .checkout-form {
       padding: 20px;
       max-width: 500px;
       margin: 0 auto;
@@ -108,7 +109,7 @@
       text-align: center;
     }
 
-    div[v-if="!showProduct"] input {
+    .checkout-form input {
       padding: 10px;
       margin: 10px 0;
       border: 1px solid #ccc;
@@ -116,7 +117,7 @@
       width: 100%;
     }
 
-    div[v-if="!showProduct"] button {
+    .checkout-form button {
       background-color: #4CAF50;
       color: white;
       border: none;
@@ -127,11 +128,26 @@
       margin-top: 20px;
     }
 
-    /* Sorting section */
-    .sort-options {
-      text-align: left;
-      padding: 20px;
+    /* Cart items styling */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
     }
+
+    .cart-item button {
+      background-color: #ff4c4c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
   </style>
 
   <title>After School App</title>
@@ -141,10 +157,12 @@
   <div id="app">
     <header>
       <h1 v-text="sitename"></h1>
-      <button v-on:click="showCheckout">
+      <button 
+        v-on:click="showCheckout" 
+        :disabled="totalLessonsInTheCart === 0 && showProduct">
         {{ totalLessonsInTheCart }}
         <span class="fa-solid fa-cart-shopping"></span>
-        Checkout
+        {{ showProduct ? 'Checkout' : 'Back to Lessons' }}
       </button>
     </header>
 
@@ -152,42 +170,24 @@
       <!-- Sorting Options -->
       <div class="sort-options">
         <h3>Sort by</h3>
-        <label>
-          <input type="radio" value="title" v-model="sortOption" />
-          Subject
-        </label>
-        <br/>
-        <label>
-          <input type="radio" value="description" v-model="sortOption" />
-          Location
-        </label>
-        <br/>
-        <label>
-          <input type="radio" value="price" v-model="sortOption" />
-          Price
-        </label>
-        <br/>
-        <label>
-          <input type="radio" value="availableInventory" v-model="sortOption" />
-          Availability
-        </label>
-        <br/>
+        <select v-model="sortOption">
+          <option value="title">Subject</option>
+          <option value="description">Location</option>
+          <option value="price">Price</option>
+          <option value="availableInventory">Availability</option>
+        </select>
+
         <h4>Order</h4>
-        <label>
-          <input type="radio" value="ascending" v-model="sortDirection" />
-          Ascending
-        </label>
-        <br/>
-        <label>
-          <input type="radio" value="descending" v-model="sortDirection" />
-          Descending
-        </label>
+        <select v-model="sortDirection">
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
       </div>
 
       <main>
         <div v-for="product in sortedProducts" :key="product.id" class="product-item">
           <h1>{{ product.title }}</h1>
-          
+
           <figure>
             <img :src="product.image" alt="Product Image" />
           </figure>
@@ -197,21 +197,35 @@
 
           <h3>Spaces: {{ product.availableSpace }}</h3>
 
-          <button v-if="canAddToCart(product)" v-on:click="addLessonsToCart(product)">
+          <!-- Add to Cart Button -->
+          <button 
+            v-if="canAddToCart(product)" 
+            v-on:click="addLessonsToCart(product)">
             Add to the Cart
           </button>
-          <button v-else disabled>Add to the Cart</button>
+          <button 
+            v-else 
+            disabled>
+            Add to the Cart
+          </button>
 
           <span v-if="itemsLeft(product) === 0">Sold out!</span>
           <span v-else-if="itemsLeft(product) < 5">Only {{ itemsLeft(product) }} left!</span>
           <span v-else>Buy Now</span>
-          
+
         </div>
       </main>
     </div>
 
+    <!-- Shopping Cart Page -->
     <div v-else>
-      <h1>Welcome to the Checkout Page</h1>
+      <h1>Shopping Cart</h1>
+      <div v-for="product in cartItems" :key="product.id" class="cart-item">
+        <span>{{ product.title }} - £{{ product.price.toFixed(2) }}</span>
+        <button v-on:click="removeLessonFromCart(product)">Remove</button>
+      </div>
+
+      <h1>Checkout</h1>
       <p>
         <strong>Name:</strong>
         <input type="text" v-model.trim="order.name" />
@@ -228,7 +242,13 @@
       <p>
         <strong>Phone Number:</strong> {{ order.phonenumber }}
       </p>
-      <button @click="submitCheckoutForm">Place Order</button>
+
+      <!-- Checkout Button -->
+      <button 
+        @click="submitCheckoutForm" 
+        :disabled="!isFormValid">
+        Place Order
+      </button>
     </div>
   </div>
 
@@ -238,38 +258,55 @@
       data: {
         sitename: "After School App",
         showProduct: true,
-        products: products,  // this connects to the product.js file
+        products: products, // this connects to the product.js file
         cart: [],
         order: {
           name: "",
           phonenumber: ""
         },
-        sortOption: 'price',  // Default sorting option
-        sortDirection: 'ascending'  // Default sorting direction
+        sortOption: 'price', // Default sorting option
+        sortDirection: 'ascending' // Default sorting direction
       },
       methods: {
         showCheckout() {
+          // Toggle between lesson page and cart page
           this.showProduct = !this.showProduct;
         },
         addLessonsToCart(product) {
-          this.cart.push(product.id);
+          if (this.canAddToCart(product)) {
+            this.cart.push(product.id);
+            // Reduce the available space once a lesson is added to the cart
+            product.availableSpace--;
+          }
+        },
+        removeLessonFromCart(product) {
+          const index = this.cart.indexOf(product.id);
+          if (index > -1) {
+            this.cart.splice(index, 1);
+            // Increase the available space once the lesson is removed from the cart
+            product.availableSpace++;
+          }
         },
         submitCheckoutForm() {
           alert("Congratulations, order submitted!");
         },
         canAddToCart(product) {
-          return product.availableInventory > this.cartCount(product.id);
+          // Button is disabled when available space is 0
+          return product.availableSpace > 0;
         },
         cartCount(productId) {
           return this.cart.filter(id => id === productId).length;
         },
         itemsLeft(product) {
-          return product.availableInventory - this.cartCount(product.id);
+          return product.availableSpace;
         }
       },
       computed: {
         totalLessonsInTheCart() {
           return this.cart.length;
+        },
+        cartItems() {
+          return this.products.filter(product => this.cart.includes(product.id));
         },
         sortedProducts() {
           let sortedArray = [...this.products];
@@ -279,20 +316,30 @@
               let fieldA = a[this.sortOption];
               let fieldB = b[this.sortOption];
 
-              if (typeof fieldA === 'string') {
+              // Handle alphabetical sorting for strings
+              if (typeof fieldA === 'string' && typeof fieldB === 'string') {
                 fieldA = fieldA.toLowerCase();
                 fieldB = fieldB.toLowerCase();
               }
 
               if (this.sortDirection === 'ascending') {
-                return fieldA > fieldB ? 1 : -1;
+                return fieldA > fieldB ? 1 : fieldA < fieldB ? -1 : 0;
               } else if (this.sortDirection === 'descending') {
-                return fieldA < fieldB ? 1 : -1;
+                return fieldA < fieldB ? 1 : fieldA > fieldB ? -1 : 0;
               }
             });
           }
 
           return sortedArray;
+        },
+        isFormValid() {
+          // Validate name contains only letters and spaces
+          const validName = /^[A-Za-z\s]+$/.test(this.order.name.trim());
+          
+          // Validate phone number contains only digits and has at least 10 digits
+          const validPhone = /^\d+$/.test(this.order.phonenumber.trim()) && this.order.phonenumber.trim().length >= 10;
+
+          return validName && validPhone;
         }
       }
     })
