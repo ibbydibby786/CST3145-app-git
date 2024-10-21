@@ -5,7 +5,7 @@ let products = [
       "description": "London",
       "price": 100.00,
       "image": "images/maths.png",
-      "availableInventory": 20,
+      "availableInventory": 10,
        "availableSpace": 5
       
     },
@@ -15,8 +15,8 @@ let products = [
       "description": "Oxford",
       "price": 90.00,
       "image": "images/english.png",
-      "availableInventory": 15,
-      "availableSpace": 10
+      "availableInventory": 10,
+      "availableSpace": 5
       
     },
     {
@@ -26,7 +26,7 @@ let products = [
       "price": 80.00,
       "image": "images/science.png",
       "availableInventory": 10,
-      "availableSpace": 10
+      "availableSpace": 5
       
     },
     {
@@ -35,8 +35,8 @@ let products = [
       "description": "York",
       "price": 70.00,
       "image": "images/religious studies.png",
-      "availableInventory": 15,
-      "availableSpace": 10
+      "availableInventory": 10,
+      "availableSpace": 5
       
     },
     {
@@ -45,8 +45,8 @@ let products = [
       "description": "Bristol",
       "price": 60.00,
       "image": "images/music.png",
-      "availableInventory": 30,
-      "availableSpace": 10
+      "availableInventory": 10,
+      "availableSpace": 5
       
     },
      {
@@ -55,8 +55,8 @@ let products = [
       "description": "Bedford",
       "price": 50.00,
       "image": "images/pe.png",
-      "availableInventory": 5,
-       "availableSpace": 10
+      "availableInventory": 10,
+       "availableSpace": 5
       
     },
     {
@@ -65,8 +65,8 @@ let products = [
         "description": "Blackburn",
         "price": 40.00,
         "image": "images/it.png",
-        "availableInventory": 5,
-         "availableSpace": 10
+        "availableInventory": 10,
+         "availableSpace": 5
         
       },
       {
@@ -75,8 +75,8 @@ let products = [
         "description": "Leicstershire",
         "price": 30.00,
         "image": "images/business studies.png",
-        "availableInventory": 5,
-         "availableSpace": 10
+        "availableInventory": 10,
+         "availableSpace": 5
         
       },
       {
@@ -86,7 +86,7 @@ let products = [
         "price": 20.00,
         "image": "images/art.png",
         "availableInventory": 10,
-         "availableSpace": 10
+         "availableSpace": 5
         
       },
       {
@@ -96,7 +96,7 @@ let products = [
         "price": 10.00,
         "image": "images/history.png",
         "availableInventory": 10,
-         "availableSpace": 10
+         "availableSpace": 5
         
       },
   ];
