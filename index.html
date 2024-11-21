@@ -8,7 +8,8 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
-  <script src="products.js"></script>
+  
+  <!--script src="products.js"></script-->
   
   <style>
     body {
@@ -225,15 +226,21 @@
         <button v-on:click="removeLessonFromCart(product)">Remove</button>
       </div>
 
-      <h1>Checkout</h1>
-      <p>
-        <strong>Name:</strong>
-        <input type="text" v-model.trim="order.name" />
-      </p>
-      <p>
-        <strong>Phone Number:</strong>
-        <input type="number" v-model.trim="order.phonenumber" />
-      </p>
+      <h2>Checkout</h2>
+<p>
+    <strong>Name:</strong>
+    <input type="text" v-model.trim="order.name" />
+</p>
+<p>
+    <strong>Phone Number:</strong>
+    <input type="number" v-model.trim="order.phonenumber" />
+</p>
+
+<!-- Checkout Button -->
+<button @click="submitCheckoutForm" :disabled="!isFormValid">
+    Place Order
+</button>
+
 
       <h2>Order Information</h2>
       <p>
@@ -253,12 +260,21 @@
   </div>
 
   <script>
-    new Vue({
+    let webstore =new Vue({
       el: "#app",
       data: {
         sitename: "After School App",
         showProduct: true,
-        products: products, // this connects to the product.js file
+        products: [],//products, // this connects to the product.js file
+        imagesBaseURL: "https://backend-app-gjtb.onrender.com/",
+        //serverBaseURL: "http://localhost:3000/",
+        //serverBaseURL: "https://cw2indpetstoreapp3-env.eba-3gkxjkz.eu-west-2.elasticbeanstalk.com/",
+        serverBaseURL: "https://backend-app-gjtb.onrender.com/",
+        productsURL: "collections/products",
+        ordersURL: "collections/orders",
+        testConsole: true,
+        showTestConsole: true,
+
         cart: [],
         order: {
           name: "",
@@ -267,6 +283,26 @@
         sortOption: 'price', // Default sorting option
         sortDirection: 'ascending' // Default sorting direction
       },
+      created: function () {
+        // fetch("http://localhost:3000/collections/products")
+        //   .then(function (response) {
+        //     response.text().then(function (text) {
+        //       alert(text);
+        //     });
+        //   });
+
+        fetch("http://localhost:3000/collections/products")
+    .then(function(response) {
+        response.json().then(function(json) {
+           // alert(json);
+           // console.log(json);
+           webstore.products = json;
+        });
+    });
+
+
+      },
+
       methods: {
         showCheckout() {
           // Toggle between lesson page and cart page
@@ -288,8 +324,36 @@
           }
         },
         submitCheckoutForm() {
-          alert("Congratulations, order submitted!");
+    const orderData = {
+        name: this.order.name,
+        phoneNumber: this.order.phonenumber,
+        lessonIDs: this.cart,
+        spaces: this.cart.length
+    };
+
+    fetch("http://localhost:3000/collections/orders", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
         },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert("Order placed successfully!");
+            // Clear cart and form fields after successful order
+            this.cart = [];
+            this.order.name = '';
+            this.order.phonenumber = '';
+            this.showCheckout();
+        } else {
+            alert("Failed to place order. Please try again.");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+},
+
         canAddToCart(product) {
           // Button is disabled when available space is 0
           return product.availableSpace > 0;
@@ -300,6 +364,7 @@
         itemsLeft(product) {
           return product.availableSpace;
         }
+        
       },
       computed: {
         totalLessonsInTheCart() {
