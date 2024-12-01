@@ -284,23 +284,20 @@
         sortDirection: 'ascending' // Default sorting direction
       },
       created: function () {
-        // fetch("http://localhost:3000/collections/products")
-        //   .then(function (response) {
-        //     response.text().then(function (text) {
-        //       alert(text);
-        //     });
-        //   });
-
-        fetch("http://localhost:3000/collections/products")
-    .then(function(response) {
-        response.json().then(function(json) {
-           // alert(json);
-           // console.log(json);
-           webstore.products = json;
-        });
-    });
-
-
+       fetch(`${this.serverBaseURL}${this.productsURL}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Network response was not ok: ${response.statusText}`);
+    }
+    return response.json();
+  })
+  .then(json => {
+    this.products = json; // Update the products array
+  })
+  .catch(error => {
+    console.error("Error fetching lessons:", error);
+    alert("Failed to load lessons. Please try again later.");
+  });
       },
 
       methods: {
